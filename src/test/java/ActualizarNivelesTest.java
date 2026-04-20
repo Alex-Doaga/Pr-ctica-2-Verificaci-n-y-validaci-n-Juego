@@ -135,7 +135,7 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP6: Caso válido simple (Caja Negra)")
+    @DisplayName("CP6: Caso válido simple")
     // CN: CV1, CV2, CV3, CV5, CV6, CV8, CV9
     // VF: VF2, VF5
     void testCP6_CasoValido() throws IOException {
@@ -165,7 +165,7 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP8: Mejor equipo sin jugadores (CI5)")
+    @DisplayName("CP8: Un mejor equipo sin jugadores")
     //CN: CI5
     void testCP8_MejorEquipoSinJugadores() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 40");
@@ -175,7 +175,7 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP9: Puntuaciones negativas (Límites sin control - CI6)")
+    @DisplayName("CP9: Puntuaciones negativas")
     //CN: CI6
     void testCP9_PuntosNegativos() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 10");
@@ -185,7 +185,7 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP10: Límite superior de TablaJugadores (Frontera - VF3)")
+    @DisplayName("CP10: Límite superior de TablaJugadores")
     //VF: VF3, VF5
     void testCP10_FronteraJugadores() throws IOException {
         String[] lineasJugadores = new String[20];
@@ -199,7 +199,7 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP11: Límite superior de TablaEquipos (Frontera - VF6)")
+    @DisplayName("CP11: Límite superior de TablaEquipos")
     // VF: VF2, VF6
     void testCP11_FronteraEquipos() throws IOException {
         String[] lineasEquipos = new String[10];
