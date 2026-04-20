@@ -100,7 +100,7 @@ class ActualizarNivelesTest {
     @DisplayName("CP4: Tabla de equipos nula")
     //CN: CI4
     void testCP4_EquiposNull() throws IOException {
-        TablaJugadores tJ = crearFicheroJugadores("Carlos false A 40");
+        TablaJugadores tJ = crearFicheroJugadores("Gil false A 40");
 
         assertThrows(NullPointerException.class, () -> {
             niveles.actualizarNiveles(tJ, null);
@@ -169,7 +169,7 @@ class ActualizarNivelesTest {
     //CN: CI5
     void testCP8_MejorEquipoSinJugadores() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 40");
-        TablaEquipos tE = crearFicheroEquipos("A 50", "B 100"); // B gana pero no tiene jugadores
+        TablaEquipos tE = crearFicheroEquipos("A 100", "B 100"); // B mejor equipo pero no tiene jugadores
 
         assertEquals(2, niveles.actualizarNiveles(tJ, tE));
     }
