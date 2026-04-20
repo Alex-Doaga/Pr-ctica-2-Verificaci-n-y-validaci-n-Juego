@@ -11,24 +11,20 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Clase de prueba experta para el método actualizarNiveles de la clase Niveles.
- * Utiliza generación de ficheros temporales para no alterar el código operativo.
- */
 class ActualizarNivelesTest {
 
     private Niveles niveles;
     private final int UMBRAL = 50;
     private final int INCREMENTO = 5;
 
+    //
     @BeforeEach
     void setUp() {
-        // Inicializamos Niveles con el incremento y el umbral
         niveles = new Niveles(INCREMENTO, UMBRAL);
     }
 
     // ========================================================================
-    // MÉTODOS AUXILIARES: Mocking de la entrada de archivos
+    // Métodos auxiliares
     // ========================================================================
 
     /**
@@ -37,7 +33,7 @@ class ActualizarNivelesTest {
      */
     private TablaJugadores crearFicheroJugadores(String... lineas) throws IOException {
         File f = File.createTempFile("jugadores_test", ".txt");
-        f.deleteOnExit(); // Se borra automáticamente al terminar la prueba
+        f.deleteOnExit();
         try (FileWriter fw = new FileWriter(f)) {
             for (String linea : lineas) {
                 fw.write(linea + "\n");
@@ -62,11 +58,14 @@ class ActualizarNivelesTest {
     }
 
     // ========================================================================
-    // BATERÍA DE CASOS DE PRUEBA (Unificación CB, CN y VF)
+    // Tests para los casos de prueba
     // ========================================================================
 
     @Test
-    @DisplayName("CP1: Tablas vacías (Frontera e Inválido - 1T)")
+    @DisplayName("CP1: Tabla de jugadores vacía ")
+    // CB: 1T
+    // CN: CI1
+    // VF: VF1, VF5
     void testCP1_TablasVacias() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores(); // Archivo vacío
         TablaEquipos tE = crearFicheroEquipos("A 100");
@@ -75,7 +74,8 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP2: Tabla de jugadores nula (CI2)")
+    @DisplayName("CP2: Tabla de jugadores nula ")
+    // CN: CI2
     void testCP2_JugadoresNull() throws IOException {
         TablaEquipos tE = crearFicheroEquipos("A 100");
 
@@ -85,7 +85,10 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP3: Tabla de equipos vacía (Circuito corto - 1FT)")
+    @DisplayName("CP3: Tabla de equipos vacía ")
+    // CB: 1FT
+    // CN: CI3
+    // VF: VF2, VF4
     void testCP3_EquiposVacia() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("Carlos false A 40");
         TablaEquipos tE = crearFicheroEquipos(); // Archivo vacío
@@ -94,7 +97,8 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP4: Tabla de equipos nula (CI4)")
+    @DisplayName("CP4: Tabla de equipos nula")
+    //CN: CI4
     void testCP4_EquiposNull() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("Carlos false A 40");
 
@@ -104,29 +108,36 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP5: Caso Maestro (Cobertura de Caja Blanca - Múltiples empates y umbrales)")
+    @DisplayName("CP5: Caso Maestro")
+    // CB: 1FF, 2T, 2F, 3T, 3F, 4T, 4F, 5T, 5F, 6T, 6F, 7T, 7F, 8F, 8TT, 8TF, 9T, 9F
     void testCP5_CasoMaestro() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores(
-                "Carlos false A 40", // Sube 1 nivel
-                "Laura true A 60",   // Sube 1 nivel (es pre pero supera umbral)
-                "Carla false X 10"   // No sube (equipo no ganador)
+                "Carlos false A 40",
+                "Laura true A 60",
+                "Manuel false A 40",
+                "Carla false X 10"
         );
         TablaEquipos tE = crearFicheroEquipos(
                 "A 100",
                 "B 50",
-                "C 100" // C empata como mejor equipo, pero no tiene jugadores
+                "C 100"
         );
 
         int resultado = niveles.actualizarNiveles(tJ, tE);
 
         assertEquals(2, resultado, "Debe devolver 2 porque el mejor equipo (C) no tiene jugadores");
-        assertEquals(41, tJ.obtenerNivel(0));
-        assertEquals(61, tJ.obtenerNivel(1));
-        assertEquals(10, tJ.obtenerNivel(2));
+
+        // Comprobaciones de nivel
+        assertEquals(41, tJ.obtenerNivel(0), "Carlos debería subir a 41");
+        assertEquals(61, tJ.obtenerNivel(1), "Laura debería subir a 61");
+        assertEquals(41, tJ.obtenerNivel(2), "Manuel debería subir a 41");
+        assertEquals(10, tJ.obtenerNivel(3), "Carla debería quedarse en 10 (ahora es el índice 3)");
     }
 
     @Test
     @DisplayName("CP6: Caso válido simple (Caja Negra)")
+    // CN: CV1, CV2, CV3, CV5, CV6, CV8, CV9
+    // VF: VF2, VF5
     void testCP6_CasoValido() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("Gil false A 40");
         TablaEquipos tE = crearFicheroEquipos("A 100");
@@ -136,15 +147,16 @@ class ActualizarNivelesTest {
     }
 
     @Test
-    @DisplayName("CP7: Dos equipos empatados, 1 jugador premium bajo umbral (CN)")
+    @DisplayName("CP7: Dos equipos empatados, 1 jugador premium bajo umbral ")
+    //CN: CV1, CV2, CV3, CV4, CV5, CV6, CV7, CV8, CV10
     void testCP7_DosEquiposEmpatados() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores(
-                "Jose false A 100", // no-premium, sobre umbral -> sube 1
-                "Diego true B 20"   // premium, bajo umbral -> sube incrementoEspecial (5)
+                "Jose false A 100",
+                "Diego true B 20"
         );
         TablaEquipos tE = crearFicheroEquipos(
                 "A 50",
-                "B 50" // A y B empatan como mejores equipos
+                "B 50"
         );
 
         assertEquals(0, niveles.actualizarNiveles(tJ, tE));
@@ -154,6 +166,7 @@ class ActualizarNivelesTest {
 
     @Test
     @DisplayName("CP8: Mejor equipo sin jugadores (CI5)")
+    //CN: CI5
     void testCP8_MejorEquipoSinJugadores() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 40");
         TablaEquipos tE = crearFicheroEquipos("A 50", "B 100"); // B gana pero no tiene jugadores
@@ -163,16 +176,17 @@ class ActualizarNivelesTest {
 
     @Test
     @DisplayName("CP9: Puntuaciones negativas (Límites sin control - CI6)")
+    //CN: CI6
     void testCP9_PuntosNegativos() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 10");
         TablaEquipos tE = crearFicheroEquipos("A -10");
 
-        // Puesto que el código no lanza excepciones por valores ilógicos, esperamos un 0
-        assertEquals(0, niveles.actualizarNiveles(tJ, tE), "El sistema procesa puntuaciones negativas con normalidad");
+        assertEquals(0, niveles.actualizarNiveles(tJ, tE), "El sistema procesa puntuaciones negativas");
     }
 
     @Test
     @DisplayName("CP10: Límite superior de TablaJugadores (Frontera - VF3)")
+    //VF: VF3, VF5
     void testCP10_FronteraJugadores() throws IOException {
         String[] lineasJugadores = new String[20];
         for (int i = 0; i < 20; i++) {
@@ -186,6 +200,7 @@ class ActualizarNivelesTest {
 
     @Test
     @DisplayName("CP11: Límite superior de TablaEquipos (Frontera - VF6)")
+    // VF: VF2, VF6
     void testCP11_FronteraEquipos() throws IOException {
         String[] lineasEquipos = new String[10];
         for (int i = 0; i < 10; i++) {
