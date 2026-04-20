@@ -136,6 +136,23 @@ class ActualizarNivelesTest {
     }
 
     @Test
+    @DisplayName("CP7: Dos equipos empatados, 1 jugador premium bajo umbral (CN)")
+    void testCP7_DosEquiposEmpatados() throws IOException {
+        TablaJugadores tJ = crearFicheroJugadores(
+                "Jose false A 100", // no-premium, sobre umbral -> sube 1
+                "Diego true B 20"   // premium, bajo umbral -> sube incrementoEspecial (5)
+        );
+        TablaEquipos tE = crearFicheroEquipos(
+                "A 50",
+                "B 50" // A y B empatan como mejores equipos
+        );
+
+        assertEquals(0, niveles.actualizarNiveles(tJ, tE));
+        assertEquals(101, tJ.obtenerNivel(0)); // Jose sube 1
+        assertEquals(25, tJ.obtenerNivel(1));  // Diego sube 5 (incrementoEspecial)
+    }
+
+    @Test
     @DisplayName("CP8: Mejor equipo sin jugadores (CI5)")
     void testCP8_MejorEquipoSinJugadores() throws IOException {
         TablaJugadores tJ = crearFicheroJugadores("P1 false A 40");
