@@ -1,0 +1,4 @@
+Gil false A 40
+Pacheco false B 55
+Dolz false A 62
+Molina true C 25
